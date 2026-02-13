@@ -850,3 +850,181 @@ X-Hub-Signature-256: <signature> (for verification)
 - Admin actions logged in CloudTrail
 - Data access patterns monitored via CloudWatch
 
+
+## 6. Deployment Architecture
+
+### 6.1 Infrastructure as Code
+
+**AWS CloudFormation / AWS SAM**:
+- All infrastructure defined as code
+- Separate stacks for different environments
+- Nested stacks for modularity
+
+**Stack Structure**:
+```
+retailmind-main-stack
+├── retailmind-network-stack (VPC, subnets, endpoints)
+├── retailmind-data-stack (DynamoDB tables, S3 buckets)
+├── retailmind-compute-stack (Lambda functions, layers)
+├── retailmind-api-stack (API Gateway, authorizers)
+├── retailmind-ai-stack (Bedrock configurations, SageMaker)
+├── retailmind-monitoring-stack (CloudWatch, alarms)
+└── retailmind-security-stack (IAM roles, Secrets Manager)
+```
+
+### 6.2 Environment Strategy
+
+**Environments**:
+
+1. **Development** (`dev`)
+   - Single region: ap-south-1 (Mumbai)
+   - Minimal resources for cost savings
+   - DynamoDB on-demand pricing
+   - Lambda: 128-512 MB memory
+   - No multi-AZ deployments
+
+2. **Staging** (`staging`)
+   - Single region: ap-south-1
+   - Production-like configuration
+   - DynamoDB provisioned capacity (low)
+   - Lambda: Production memory settings
+   - Used for integration testing
+
+3. **Production** (`prod`)
+   - Primary region: ap-south-1 (Mumbai)
+   - Backup region: ap-southeast-1 (Singapore) for DR
+   - DynamoDB provisioned capacity with auto-scaling
+   - Lambda: Optimized memory and concurrency
+   - Multi-AZ for critical components
+
+**Environment Variables**:
+```
+ENVIRONMENT: dev|staging|prod
+AWS_REGION: ap-south-1
+DYNAMODB_TABLE_PREFIX: retailmind-{env}-
+S3_BUCKET_PREFIX: retailmind-{env}-
+LOG_LEVEL: DEBUG|INFO|WARN|ERROR
+BEDROCK_MODEL_ID: anthropic.claude-3-sonnet-20240229-v1:0
+WHATSAPP_API_VERSION: v18.0
+```
+
+### 6.3 CI/CD Pipeline
+
+**GitHub Actions Workflow**:
+
+```yaml
+name: Deploy RetailMind AI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run unit tests
+        run: pytest tests/unit
+      - name: Run integration tests
+        run: pytest tests/integration
+
+  deploy-dev:
+    needs: test
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+      - name: Deploy to dev
+        run: sam deploy --config-env dev
+
+  deploy-prod:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+      - name: Deploy to prod
+        run: sam deploy --config-env prod
+```
+
+**Deployment Steps**:
+1. Code commit to GitHub
+2. Automated tests run (unit + integration)
+3. Build Lambda deployment packages
+4. Package CloudFormation templates
+5. Deploy to target environment
+6. Run smoke tests
+7. Send deployment notification
+
+### 6.4 Lambda Deployment
+
+**Deployment Package**:
+- Python code + dependencies in ZIP file
+- Lambda layers for common dependencies (boto3, requests)
+- Separate layer for AI/ML libraries (if needed)
+
+**Versioning**:
+- Lambda versions for each deployment
+- Aliases: `dev`, `staging`, `prod`
+- Gradual rollout using weighted aliases (10% → 50% → 100%)
+
+**Cold Start Optimization**:
+- Provisioned concurrency for critical functions (Orchestrator)
+- Lambda SnapStart (if using Java/Python 3.11+)
+- Minimal dependencies in deployment package
+- Connection pooling for DynamoDB
+
+### 6.5 Database Migration
+
+**DynamoDB Schema Updates**:
+- Backward-compatible changes only
+- New attributes added without removing old ones
+- Migration Lambda for data transformation
+- Blue-green deployment for breaking changes
+
+**Migration Process**:
+1. Deploy new Lambda version with updated schema
+2. Run migration Lambda to update existing records
+3. Monitor for errors
+4. Switch traffic to new version
+5. Deprecate old attributes after grace period
+
+### 6.6 Rollback Strategy
+
+**Automated Rollback Triggers**:
+- Error rate >5% for 5 minutes
+- Latency >5 seconds (p99) for 5 minutes
+- CloudWatch alarm triggers rollback
+
+**Rollback Process**:
+1. CloudWatch alarm triggers SNS notification
+2. Lambda function updates alias to previous version
+3. CloudFormation stack rollback (if infrastructure change)
+4. Incident notification to team
+5. Post-mortem analysis
+
+### 6.7 Disaster Recovery
+
+**RTO (Recovery Time Objective)**: 4 hours  
+**RPO (Recovery Point Objective)**: 1 hour
+
+**DR Strategy**:
+- DynamoDB global tables (primary: Mumbai, replica: Singapore)
+- S3 cross-region replication
+- Lambda functions deployed in both regions
+- Route 53 health checks with failover routing
+
+**Failover Process**:
+1. Automated health checks detect primary region failure
+2. Route 53 switches traffic to secondary region
+3. Lambda functions in secondary region activated
+4. DynamoDB global tables provide data consistency
+5. Manual verification and monitoring
+
