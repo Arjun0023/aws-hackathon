@@ -7,45 +7,29 @@
 **Problem Statement:** AI for Retail, Commerce & Market Intelligence  
 **Target Audience:** Small & Medium Businesses (SMBs) across India
 
+![System Architecture](generated-diagrams/retailmind-ai-architecture.png.png)
+
 ## Executive Summary
 
-RetailBrain AI is an AI-powered WhatsApp assistant that transforms small businesses into smarter, more profitable operations without requiring technical skills or large budgets. The solution provides voice/text-based AI assistance in multiple Indian languages (Hindi, Marathi, English) for inventory management, demand forecasting, dynamic pricing, customer service, and proactive business insights.
+RetailBrain AI is an AI-powered WhatsApp assistant that transforms small businesses into smarter, more profitable operations. Voice/text-based AI assistance in Hindi, Marathi, and English for inventory management, demand forecasting, dynamic pricing, customer service, and proactive insights.
 
 ## Problem Statement
 
-### Current Challenges for SMBs
+SMB owners spend 4-6 hours daily on routine tasks without access to affordable business intelligence. Existing solutions are either too complex (SAP, Zoho) or lack AI capabilities (Khatabook). Most don't support regional languages or provide proactive insights.
 
-1. **Time-Intensive Manual Work**: SMB owners spend 4-6 hours daily on routine tasks (inventory tracking, customer queries, pricing decisions)
-2. **Limited Access to Business Intelligence**: Lack affordable tools for demand forecasting and market trend analysis
-3. **Technology Barriers**: Existing solutions (SAP, Zoho) are too complex and expensive; basic apps (Khatabook) lack AI capabilities
-4. **Language & Accessibility**: Most tools don't support regional languages or voice interfaces
-5. **Reactive Decision Making**: No proactive alerts for inventory, pricing, or market opportunities
+**Target Market**: Retail shops, online sellers, marketplace vendors (Meesho/Flipkart), D2C brands in tier-2/3 cities. Initial focus: Pune. Scale potential: Millions of SMBs across India.
 
-### Target Market
-
-- **Primary**: Retail shops, online sellers, marketplace vendors (Meesho/Flipkart), D2C brands in tier-2/3 cities
-- **Secondary**: Local service providers, cafes, boutiques, rural businesses
-- **Initial Focus**: Pune and surrounding areas
-- **Scale Potential**: Millions of SMBs across India
+![Core Features](generated-diagrams/retailmind-features.png.png)
 
 ## Solution Overview
 
-### One-Liner
 WhatsApp + Voice AI that turns any small business into a smarter, more profitable operation — no tech skills or big budget required.
 
-### Core Value Proposition
+**Value Proposition**: Accessible (WhatsApp, multi-language voice), Intelligent (AI-powered insights), Proactive (alerts before problems occur), Simple (zero-infrastructure setup), Affordable (AWS serverless).
 
-1. **Accessibility**: Works via WhatsApp with voice/text in Hindi, Marathi, English
-2. **Intelligence**: AI-powered insights for inventory, forecasting, pricing, and customer service
-3. **Proactivity**: Sends alerts and suggestions before problems occur
-4. **Simplicity**: Zero-infrastructure setup, no technical knowledge required
-5. **Affordability**: Powered by AWS serverless architecture for cost efficiency
+**Expected Impact**: Save 4-6 hours/day, boost revenue 20-30%, empower non-tech owners.
 
-### Expected Impact
-
-- **Time Savings**: 4-6 hours per day on routine tasks
-- **Revenue Growth**: 20-30% increase through smarter decisions
-- **Empowerment**: Non-tech owners gain access to powerful AI tools
+![Process Flow](generated-diagrams/retailmind-process-flow.png.png)
 
 ## Functional Requirements
 
@@ -194,144 +178,45 @@ WhatsApp + Voice AI that turns any small business into a smarter, more profitabl
 
 ## Non-Functional Requirements
 
-### NFR1: Performance
+![Security & Scalability](generated-diagrams/retailmind-security-scalability.png.png)
 
-- **Response Time**: <3 seconds for 95% of text queries
-- **Voice Processing**: <5 seconds for voice-to-text conversion
-- **Concurrent Users**: Support 1,000+ simultaneous users
-- **Uptime**: 99.5% availability
+**Performance**: <3s response time (95%), <5s voice processing, 1,000+ concurrent users, 99.5% uptime
 
-### NFR2: Scalability
+**Scalability**: Scale 100→10,000 users without architecture changes, handle 1M+ transactions/month, auto-scaling enabled
 
-- **User Growth**: Scale from 100 to 10,000 users without architecture changes
-- **Data Volume**: Handle 1M+ transactions per month
-- **Auto-scaling**: Automatic resource scaling based on demand
+**Security**: Encryption at rest/transit, IAM least privilege, GDPR-ready, multi-tenant data isolation
 
-### NFR3: Security & Privacy
+**Reliability**: Daily backups, RPO <1hr, RTO <4hrs, graceful error handling, CloudTrail audit logs
 
-- **Data Encryption**: All data encrypted at rest (S3, DynamoDB) and in transit (HTTPS)
-- **Authentication**: Secure WhatsApp Business API integration
-- **Access Control**: IAM-based least privilege access
-- **Compliance**: GDPR-ready data handling
-- **Data Isolation**: Multi-tenant architecture with data segregation
+**Usability**: Multi-language (Hindi/Marathi/English), voice interface, <30min learning curve, works on any smartphone
 
-### NFR4: Reliability
-
-- **Data Backup**: Automated daily backups to S3
-- **Disaster Recovery**: RPO <1 hour, RTO <4 hours
-- **Error Handling**: Graceful degradation with user-friendly error messages
-- **Audit Logging**: Complete audit trail via CloudTrail
-
-### NFR5: Usability
-
-- **Language Support**: Hindi, Marathi, English (expandable)
-- **Voice Interface**: Natural language voice commands
-- **Learning Curve**: <30 minutes for basic operations
-- **Accessibility**: Works on any smartphone with WhatsApp
-
-### NFR6: Cost Efficiency
-
-- **MVP Cost**: ₹0-5,000 (AWS Free Tier + hackathon credits)
-- **Scaled Cost**: ₹15,000-30,000/month for 1,000 users
-- **Per-User Cost**: ₹15-30/user/month at scale
-- **Pricing Model**: ₹99-499/user/month subscription
+**Cost**: MVP ₹0-5K (Free Tier), scaled ₹15-30K/month (1,000 users), subscription ₹99-499/user/month
 
 ## Technical Requirements
 
-### TR1: AWS Services Integration
+![Data Flow](generated-diagrams/retailmind-data-flow.png.png)
 
-**Required Services**:
-- Amazon Bedrock (LLMs for AI reasoning)
-- Amazon Q (business intelligence queries)
-- AWS Lambda (serverless compute)
-- Amazon API Gateway (HTTP endpoints)
-- Amazon Transcribe (speech-to-text)
-- Amazon Polly (text-to-speech)
-- Amazon DynamoDB (structured data storage)
-- Amazon S3 (file storage)
-- Amazon SageMaker (ML forecasting)
-- Amazon EventBridge (scheduled events)
-- Amazon SNS (notifications)
-- AWS IAM (security)
-- AWS Secrets Manager (API key management)
-- Amazon CloudWatch (monitoring)
-- AWS CloudTrail (audit logging)
+**AWS Services**: Bedrock (LLMs), Amazon Q (BI), Lambda (compute), API Gateway, Transcribe/Polly (voice), DynamoDB (data), S3 (storage), SageMaker (ML), EventBridge (scheduling), SNS (notifications), IAM, Secrets Manager, CloudWatch, CloudTrail
 
-### TR2: External Integrations
+**External Integrations**: WhatsApp Business API, Google Sheets API (optional), Payment gateway
 
-- WhatsApp Business API (primary interface)
-- Google Sheets API (optional data import)
-- Payment gateway (for subscriptions)
+**Data Models**: Users (profile, preferences, subscription), Inventory (items, stock, thresholds), Transactions (sales/purchases), Forecasts (predictions, confidence), Alerts (notifications, status)
 
-### TR3: Data Models
-
-**User Profile**:
-- User ID, business name, category, location
-- Language preference, notification settings
-- Subscription tier, payment status
-
-**Inventory**:
-- Item ID, name, category, SKU
-- Current stock, minimum threshold
-- Unit price, cost price
-- Last updated timestamp
-
-**Transaction History**:
-- Transaction ID, date, item, quantity
-- Sale/purchase type, amount
-- Customer reference (if applicable)
-
-**Forecasts**:
-- Item ID, forecast date, predicted demand
-- Confidence level, factors considered
-- Actual vs predicted (for learning)
-
-### TR4: API Specifications
-
-**WhatsApp Webhook**:
-- POST /webhook - Receive messages
-- GET /webhook - Verification
-
-**Internal APIs**:
-- POST /process-query - Process user query
-- GET /inventory/{userId} - Get inventory
-- POST /inventory/{userId} - Update inventory
-- GET /forecast/{userId}/{itemId} - Get demand forecast
-- POST /alert/{userId} - Send proactive alert
+**Key APIs**: POST/GET /webhook (WhatsApp), POST /process-query, GET/POST /inventory/{userId}, GET /forecast/{userId}/{itemId}
 
 ## User Stories
 
-### Epic 1: Inventory Management
+![Use Cases](generated-diagrams/retailmind-use-cases.png.png)
 
-**US1.1**: As an SMB owner, I want to check my current stock levels by asking "How many shirts do I have?" so that I can quickly know my inventory status.
+**Inventory Management**: Check stock ("How many shirts?"), receive low stock alerts, update via voice ("Sold 5 shirts today")
 
-**US1.2**: As an SMB owner, I want to receive alerts when stock is low so that I can reorder before running out.
+**Demand Forecasting**: Get 7/14/30-day predictions, receive seasonal spike notifications
 
-**US1.3**: As an SMB owner, I want to update inventory by saying "Sold 5 shirts today" so that I can keep records without manual data entry.
+**Pricing Intelligence**: Get pricing suggestions based on demand, discount recommendations for slow-moving items
 
-### Epic 2: Demand Forecasting
+**Customer Service**: Auto-reply to availability queries, escalate complex queries with context
 
-**US2.1**: As an SMB owner, I want to know predicted demand for next week so that I can plan my inventory purchases.
-
-**US2.2**: As an SMB owner, I want to be notified about upcoming seasonal spikes so that I can stock up in advance.
-
-### Epic 3: Pricing Intelligence
-
-**US3.1**: As an SMB owner, I want pricing suggestions based on demand so that I can maximize profits.
-
-**US3.2**: As an SMB owner, I want to know when to offer discounts so that I can clear slow-moving inventory.
-
-### Epic 4: Customer Service
-
-**US4.1**: As an SMB owner, I want the AI to auto-reply to customer queries about product availability so that I can save time.
-
-**US4.2**: As an SMB owner, I want complex customer queries forwarded to me with context so that I can handle them personally.
-
-### Epic 5: Proactive Insights
-
-**US5.1**: As an SMB owner, I want a daily business summary so that I can start my day informed.
-
-**US5.2**: As an SMB owner, I want alerts about demand spikes so that I can capitalize on opportunities.
+**Proactive Insights**: Daily business summaries, demand spike alerts, weekly performance reports
 
 ## Success Metrics
 
